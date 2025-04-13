@@ -6,8 +6,66 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout="wide", page_title="Stock Dashboard")
 st.title("📊 Stock Dashboard using yFinance + Streamlit")
 
-# Stock input
-ticker_input = st.text_input("Enter Stock Symbol (e.g., AAPL, MSFT, RELIANCE.NS)", value="AAPL")
+# List of NIFTY 50 companies and their ticker symbols
+nifty_50_stocks = {
+    "Adani Enterprises": "ADANIGREEN.NS",
+    "Adani Ports": "ADANIPORTS.NS",
+    "Apollo Hospital": "APOLLOHOSP.NS",
+    "Asian Paints": "ASIANPAINT.NS",
+    "Axis Bank": "AXISBANK.NS",
+    "Bajaj Auto": "BAJAJ-AUTO.NS",
+    "Bajaj Finance": "BAJFINANCE.NS",
+    "Bajaj Finserv": "BAJAJFINSV.NS",
+    "Bharat Electronics": "BEL.NS",
+    "Bharti Airtel": "BHARTIARTL.NS",
+    "Cipla": "CIPLA.NS",
+    "Coal India": "COALINDIA.NS",
+    "Dr. Reddy's Laboratories": "DRREDDY.NS",
+    "Eicher Motors": "EICHERMOT.NS",
+    "Grasim": "GRASIM.NS",
+    "HCL Technologies": "HCLTECH.NS",
+    "HDFC Bank": "HDFCBANK.NS",
+    "HDFC Life": "HDFCLIFE.NS",
+    "Hero Motocorp": "HEROMOTOCO.NS",
+    "Hindalco": "HINDALCO.NS",
+    "Hindustan Unilever (HUL)": "HINDUNILVR.NS",
+    "ICICI Bank": "ICICIBANK.NS",
+    "IndusInd Bank": "INDUSINDBK.NS",
+    "Infosys": "INFY.NS",
+    "ITC": "ITC.NS",
+    "JSW Steel": "JSWSTEEL.NS",
+    "Kotak Mahindra Bank": "KOTAKBANK.NS",
+    "Larsen & Toubro": "LT.NS",
+    "Mahindra & Mahindra (M&M)": "M&M.NS",
+    "Maruti Suzuki": "MARUTI.NS",
+    "Nestlé": "NESTLEIND.NS",
+    "NTPC": "NTPC.NS",
+    "ONGC": "ONGC.NS",
+    "Power Grid Corporation": "POWERGRID.NS",
+    "Reliance Industries": "RELIANCE.NS",
+    "SBI Life Insurance": "SBILIFE.NS",
+    "Shriram Finance": "SHRIRAMFIN.NS",
+    "State Bank of India (SBI)": "SBIN.NS",
+    "Sun Pharma": "SUNPHARMA.NS",
+    "TCS": "TCS.NS",
+    "Tata Consumer Products": "TATACONSUM.NS",
+    "Tata Motors": "TATAMOTORS.NS",
+    "Tata Steel": "TATASTEEL.NS",
+    "Tech Mahindra": "TECHM.NS",
+    "Titan Company": "TITAN.NS",
+    "Trent": "TRENT.NS",
+    "UltraTech Cement": "ULTRACEMCO.NS",
+    "Wipro": "WIPRO.NS"
+}
+
+# Stock input with suggestions
+st.header("Search Stock")
+selected_stock = st.selectbox(
+    "Select a NIFTY 50 stock:",
+    options=[""] + list(nifty_50_stocks.keys())
+)
+
+ticker_input = nifty_50_stocks.get(selected_stock)
 
 if ticker_input:
     stock = yf.Ticker(ticker_input)
@@ -131,3 +189,30 @@ if ticker_input:
     with col2:
         st.subheader("Quarterly Earnings")
         st.dataframe(stock.quarterly_earnings)
+
+# Button to generate CSV for NIFTY 50 stocks
+if st.button("Generate NIFTY 50 CSV"):
+    data = []
+    for name, symbol in nifty_50_stocks.items():
+        stock = yf.Ticker(symbol)
+        info = stock.info
+        row = {
+            "Name": name,
+            "Symbol": symbol,
+            "Sector": info.get("sector", "N/A"),
+            "Industry": info.get("industry", "N/A"),
+            "Previous Close": info.get("previousClose", "N/A"),
+            "Open": info.get("open", "N/A"),
+            "Day High": info.get("dayHigh", "N/A"),
+            "Day Low": info.get("dayLow", "N/A"),
+            "52-Week Low": info.get("fiftyTwoWeekLow", "N/A"),
+            "52-Week High": info.get("fiftyTwoWeekHigh", "N/A"),
+        }
+        data.append(row)
+
+    # Create a DataFrame and save it as a CSV file
+    df = pd.DataFrame(data)
+    csv_file = "nifty_50_stocks.csv"
+    df.to_csv(csv_file, index=False)
+    st.success(f"CSV file '{csv_file}' has been generated!")
+    st.dataframe(df)
