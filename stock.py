@@ -8,9 +8,9 @@ st.title("📊 Stock Dashboard using yFinance + Streamlit")
 
 # List of NIFTY 50 companies and their ticker symbols
 nifty_50_stocks = {
-    "Adani Enterprises": "ADANIGREEN.NS",
+    "Adani Enterprises": "ADANIENT.NS",
     "Adani Ports": "ADANIPORTS.NS",
-    "Apollo Hospital": "APOLLOHOSP.NS",
+    "Apollo Hospitals": "APOLLOHOSP.NS",
     "Asian Paints": "ASIANPAINT.NS",
     "Axis Bank": "AXISBANK.NS",
     "Bajaj Auto": "BAJAJ-AUTO.NS",
@@ -22,32 +22,34 @@ nifty_50_stocks = {
     "Coal India": "COALINDIA.NS",
     "Dr. Reddy's Laboratories": "DRREDDY.NS",
     "Eicher Motors": "EICHERMOT.NS",
-    "Grasim": "GRASIM.NS",
+    "Ethernal": "ZOMATO.NS",
+    "Grasim Industries": "GRASIM.NS",
     "HCL Technologies": "HCLTECH.NS",
     "HDFC Bank": "HDFCBANK.NS",
-    "HDFC Life": "HDFCLIFE.NS",
-    "Hero Motocorp": "HEROMOTOCO.NS",
-    "Hindalco": "HINDALCO.NS",
-    "Hindustan Unilever (HUL)": "HINDUNILVR.NS",
+    "HDFC Life Insurance": "HDFCLIFE.NS",
+    "Hero MotoCorp": "HEROMOTOCO.NS",
+    "Hindalco Industries": "HINDALCO.NS",
+    "Hindustan Unilever": "HINDUNILVR.NS",
     "ICICI Bank": "ICICIBANK.NS",
     "IndusInd Bank": "INDUSINDBK.NS",
     "Infosys": "INFY.NS",
     "ITC": "ITC.NS",
+    "Jio Financial Services": "JIOFIN.NS",
     "JSW Steel": "JSWSTEEL.NS",
     "Kotak Mahindra Bank": "KOTAKBANK.NS",
     "Larsen & Toubro": "LT.NS",
-    "Mahindra & Mahindra (M&M)": "M&M.NS",
+    "Mahindra & Mahindra": "M&M.NS",
     "Maruti Suzuki": "MARUTI.NS",
-    "Nestlé": "NESTLEIND.NS",
+    "Nestle India": "NESTLEIND.NS",
     "NTPC": "NTPC.NS",
-    "ONGC": "ONGC.NS",
+    "Oil and Natural Gas Corporation": "ONGC.NS",
     "Power Grid Corporation": "POWERGRID.NS",
     "Reliance Industries": "RELIANCE.NS",
     "SBI Life Insurance": "SBILIFE.NS",
     "Shriram Finance": "SHRIRAMFIN.NS",
-    "State Bank of India (SBI)": "SBIN.NS",
-    "Sun Pharma": "SUNPHARMA.NS",
-    "TCS": "TCS.NS",
+    "State Bank of India": "SBIN.NS",
+    "Sun Pharmaceutical": "SUNPHARMA.NS",
+    "Tata Consultancy Services": "TCS.NS",
     "Tata Consumer Products": "TATACONSUM.NS",
     "Tata Motors": "TATAMOTORS.NS",
     "Tata Steel": "TATASTEEL.NS",
@@ -216,3 +218,34 @@ if st.button("Generate NIFTY 50 CSV"):
     df.to_csv(csv_file, index=False)
     st.success(f"CSV file '{csv_file}' has been generated!")
     st.dataframe(df)
+
+# Button to generate and display sorted NIFTY 50 table
+if st.button("Generate and Sort NIFTY 50 Table by Sector"):
+    data = []
+    for name, symbol in nifty_50_stocks.items():
+        stock = yf.Ticker(symbol)
+        info = stock.info
+        row = {
+            "Name": name,
+            "Symbol": symbol,
+            "Sector": info.get("sector", "N/A"),
+            "Industry": info.get("industry", "N/A"),
+            "Previous Close": info.get("previousClose", "N/A"),
+            "Open": info.get("open", "N/A"),
+            "Day High": info.get("dayHigh", "N/A"),
+            "Day Low": info.get("dayLow", "N/A"),
+            "52-Week Low": info.get("fiftyTwoWeekLow", "N/A"),
+            "52-Week High": info.get("fiftyTwoWeekHigh", "N/A"),
+        }
+        data.append(row)
+
+    # Create a DataFrame, sort by Sector, and display it
+    df = pd.DataFrame(data)
+    sorted_df = df.sort_values(by="Sector")
+    st.header("📋 NIFTY 50 Table Sorted by Sector")
+    st.dataframe(sorted_df)
+
+    # Optionally save the sorted table as a CSV file
+    csv_file = "nifty_50_sorted_by_sector.csv"
+    sorted_df.to_csv(csv_file, index=False)
+    st.success(f"Sorted CSV file '{csv_file}' has been generated!")
